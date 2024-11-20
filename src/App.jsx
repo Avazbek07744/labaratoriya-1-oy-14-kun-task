@@ -1,75 +1,118 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const App = () => {
-  const [input, setInput] = useState("");
-  const [colors, setColors] = useState(
-    Array(16).fill("bg-red-500")
-  );
+  const gridSize = 8;
+  const [greenCell, setGreenCell] = useState({ row: 0, col: 0 });
+  const [blueCell, setBlueCell] = useState({ row: 0, col: 0 });
+  const [redCell, setRedCell] = useState(null);
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    const randomRow = Math.floor(Math.random() * gridSize);
+    const randomCol = Math.floor(Math.random() * gridSize);
+    setGreenCell({ row: randomRow, col: randomCol });
+  }, []);
 
   const handleInputChange = (e) => {
-    setInput(e.target.value);
+    setInputValue(e.target.value.toLowerCase());
   };
 
   const handleButtonClick = () => {
-    let tanlangan = Array(16).fill("bg-red-500");
-    let yasahilSpan = tanlangan.indexOf("bg-green-500");
-    if (yasahilSpan === -1) yasahilSpan = 4;
+    let { row, col } = blueCell;
 
-    for (let char of input) {
-      if (char === "v" && yasahilSpan < 6) {
-        yasahilSpan += 3;
-      } else if (char === "l" && yasahilSpan % 3 > 0) {
-        yasahilSpan -= 1;
-      } else if (char === "b" && yasahilSpan >= 3) {
-        yasahilSpan -= 3;
-      } else if (char === "p" && yasahilSpan % 3 < 2) {
-        yasahilSpan += 1;
+    for (const char of inputValue) {
+      switch (char) {
+        case "t":
+          row = row > 0 ? row - 1 : row;
+          break;
+        case "l":
+          col = col > 0 ? col - 1 : col;
+          break;
+        case "r":
+          col = col < gridSize - 1 ? col + 1 : col;
+          break;
+        case "p":
+          row = row < gridSize - 1 ? row + 1 : row;
+          break;
+        default:
+          alert(`Noto‘g‘ri harf: ${char}`);
+          return;
       }
     }
 
-    tanlangan[yasahilSpan] = "bg-green-500";
-    setColors(tanlangan);
+    setBlueCell({ row, col });
+
+    if (row === greenCell.row && col === greenCell.col) {
+      setGreenCell(null);
+      setRedCell({ row, col });
+    }
+
+    setInputValue("");
+  };
+
+
+  const handleAddClick = () => {
+
+    if (redCell) {
+      setRedCell(null);
+    }
+
+
+    setGreenCell(blueCell);
   };
 
   return (
-    <div>
-      <div className="grid grid-rows-4 grid-cols-4 gap-5 items-center w-[300px] mx-auto mt-40">
-        {colors.map((color, index) => (
-          <span
-            key={index}
-            className={`p-5 border border-gray-500 ${color} w-max h-5 rounded-md`}
-          ></span>
-        ))}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-800">
+      <h1 className="text-2xl font-bold mb-6">Dinamik harakatli UI</h1>
+      <div className="grid grid-cols-8 gap-2">
+        {Array.from({ length: gridSize }).map((_, row) =>
+          Array.from({ length: gridSize }).map((_, col) => (
+            <span
+              key={`${row}-${col}`}
+              className={`w-12 h-12 border rounded ${greenCell?.row === row && greenCell?.col === col
+                ? "bg-green-500"
+                : blueCell.row === row && blueCell.col === col
+                  ? "bg-blue-500"
+                  : redCell?.row === row && redCell?.col === col
+                    ? "bg-red-500"
+                    : "bg-gray-200"
+                }`}
+            ></span>
+          ))
+        )}
       </div>
-      <form
-        className="w-72 flex flex-col gap-2 mt-10 mx-auto"
-        onSubmit={(e) => e.preventDefault()}
-      >
+      <div className="mt-6 flex flex-col items-center">
         <label
-          htmlFor="inp"
-          className="px-2 text-xl font-semibold text-blue-700"
+          htmlFor="moveInput"
+          className="text-lg font-semibold mb-2 text-blue-600"
         >
-          Joylashuvni kiriting
+          Harakatni kiriting
         </label>
-        <div className="flex gap-3">
-          <div className="border border-blue-500 w-full py-3 rounded-md">
-            <input
-              placeholder="Joylashuvni kiriting"
-              type="text"
-              id="inp"
-              className="w-full outline-none border-none px-5"
-              value={input}
-              onChange={handleInputChange}
-            />
-          </div>
+        <div className="flex items-center space-x-3">
+          <input
+            id="moveInput"
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            placeholder="Harakatlar (masalan, llrtp)"
+            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
           <button
-            className="bg-green-500 px-5 py-3 uppercase text-white rounded-md w-max"
             onClick={handleButtonClick}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
-            ok
+            OK
           </button>
+          {redCell && (
+            <button
+              onClick={handleAddClick}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              ADD
+            </button>
+          )}
         </div>
-      </form>
+      </div>
     </div>
   );
 };
