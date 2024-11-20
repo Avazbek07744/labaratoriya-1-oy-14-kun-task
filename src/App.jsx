@@ -72,7 +72,8 @@ const App = () => {
                 ? "bg-green-500"
                 : blueCell.row === row && blueCell.col === col
                   ? "bg-blue-500"
-                  : redCell?.row === row && redCell?.col === col
+                  : redCell?.row === row && redCell?.col === col  
+                  
                     ? "bg-red-500"
                     : "bg-gray-200"
                 }`}
