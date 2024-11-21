@@ -6,6 +6,7 @@ const App = () => {
   const [blueCell, setBlueCell] = useState({ row: 0, col: 0 });
   const [redCell, setRedCell] = useState(null);
   const [inputValue, setInputValue] = useState("");
+  const [movements, setMovements] = useState([]); // Harakatlar ro'yxati
 
   useEffect(() => {
     const randomRow = Math.floor(Math.random() * table);
@@ -23,22 +24,41 @@ const App = () => {
     for (const char of inputValue) {
       switch (char) {
         case "t":
-          row = row > 0 ? row - 1 : row;
+          if (row === 0) {
+            alert("Robot yuqoriga yura olmaydi!");
+            return;
+          }
+          row -= 1;
           break;
         case "l":
-          col = col > 0 ? col - 1 : col;
+          if (col === 0) {
+            alert("Robot chapga yura olmaydi!");
+            return;
+          }
+          col -= 1;
           break;
         case "r":
-          col = col < table - 1 ? col + 1 : col;
+          if (col === table - 1) {
+            alert("Robot o‘ngga yura olmaydi!");
+            return;
+          }
+          col += 1;
           break;
         case "p":
-          row = row < table - 1 ? row + 1 : row;
+          if (row === table - 1) {
+            alert("Robot pastga yura olmaydi!");
+            return;
+          }
+          row += 1;
           break;
         default:
           alert(`Noto‘g‘ri harf: ${char}`);
           return;
       }
     }
+
+    // Harakatlarni ro'yxatga qo'shish
+    setMovements((prevMovements) => [...prevMovements, inputValue]);
 
     setBlueCell({ row, col });
 
@@ -50,33 +70,29 @@ const App = () => {
     setInputValue("");
   };
 
-
   const handleAddClick = () => {
-
     if (redCell) {
       setRedCell(null);
     }
-
 
     setGreenCell(blueCell);
   };
 
   return (
-    <div>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-800">
+    <div className="flex">
+      <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-800">
         <div className="grid grid-cols-12 gap-2">
           {Array.from({ length: table }).map((_, row) =>
             Array.from({ length: table }).map((_, col) => (
               <span
                 key={`${row}-${col}`}
                 className={`w-12 h-12 border rounded ${greenCell?.row === row && greenCell?.col === col
-                  ? "bg-green-500"
-                  : blueCell.row === row && blueCell.col === col
-                    ? "bg-blue-500"
-                    : redCell?.row === row && redCell?.col === col
-
-                      ? "bg-red-500"
-                      : "bg-gray-200"
+                    ? "bg-green-500"
+                    : blueCell.row === row && blueCell.col === col
+                      ? "bg-blue-500"
+                      : redCell?.row === row && redCell?.col === col
+                        ? "bg-red-500"
+                        : "bg-gray-200"
                   }`}
               ></span>
             ))
@@ -114,6 +130,17 @@ const App = () => {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="w-1/4 p-4 bg-gray-200 text-2xl">
+        <h2 className="text-black font-semibold mb-4">Harakatlar</h2>
+        <ul className="list-disc pl-5">
+          {movements.map((move, index) => (
+            <li key={index} className="text-gray-800 list-none">
+              {move}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
