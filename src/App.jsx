@@ -6,7 +6,7 @@ const App = () => {
   const [blueCell, setBlueCell] = useState({ row: 0, col: 0 });
   const [redCell, setRedCell] = useState(null);
   const [inputValue, setInputValue] = useState("");
-  const [movements, setMovements] = useState([]); // Harakatlar ro'yxati
+  const [movements, setMovements] = useState([]); 
 
   useEffect(() => {
     const randomRow = Math.floor(Math.random() * table);
@@ -57,7 +57,6 @@ const App = () => {
       }
     }
 
-    // Harakatlarni ro'yxatga qo'shish
     setMovements((prevMovements) => [...prevMovements, inputValue]);
 
     setBlueCell({ row, col });
